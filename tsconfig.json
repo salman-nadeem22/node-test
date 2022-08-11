@@ -19,22 +19,8 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@/*": ["src/*"],
+      "@common/*": ["src/common/*"],
       "@modules/*": ["src/modules/*"],
-      "@guards/*": [
-        "src/common/guards/*",
-        "src/common/guards/index.ts",
-      ],
-      "@config/*": [
-        "src/configs/*"
-      ],
-      "@decorators/*": [
-        "src/common/decorators/*",
-        "src/common/decorators/index"
-      ],
-      "@exception-filters/*": [
-        "src/common/exception-filters/*",
-        "src/common/exception-filters/index"
-      ],
     },
   }
 }

@@ -1,7 +1,8 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import bcrypt from 'bcrypt';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -10,15 +11,21 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private configService: ConfigService,
+    private userService: UserService,
   ) {}
 
-  async login(payload: { user: any }) {
-    const { user } = payload;
-    return this.sendToken({ id: user.id });
+  async register(createUserDto: CreateUserDto) {
+    const user = await this.userService.create(createUserDto);
+    return this.sendToken({_id:user._id});
   }
 
-  async sendToken(data: { id: string }) {
-    const { accessToken } = await this.accessToken(data);
+  login(payload: { user: any }) {
+    const { user } = payload;
+    return this.sendToken({ _id: user.id });
+  }
+
+  sendToken(data: { _id: string }) {
+    const { accessToken } = this.accessToken(data);
     return { state: 'LOGIN', access: accessToken };
   }
 
@@ -26,13 +33,13 @@ export class AuthService {
     return true;
   }
 
-  async accessToken(payload: { id: string }) {
+  accessToken(payload: { _id: string }) {
     return {
       accessToken: this.jwtService.sign(
-        { id: payload.id },
+        { id: payload._id },
         {
-          secret: this.configService.get<string>('auth.jwtSecret'),
-          expiresIn: this.configService.get<string>('auth.jwtExpireAt'),
+          secret: this.configService.get<string>('JWT_SECRET'),
+          expiresIn: this.configService.get<string>('JWT_EXPIRE'),
         },
       ),
     };
