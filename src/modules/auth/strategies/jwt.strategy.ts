@@ -13,8 +13,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload) {
-    const user = this.authService.IsAccessVerified(payload);
+  async validate(payload: { id: string }) {
+    const user = await this.authService.IsAccessVerified(payload.id);
     return user || false;
   }
 }

@@ -1,20 +1,15 @@
 import { BasicStrategy as Strategy } from 'passport-http';
 import { PassportStrategy } from '@nestjs/passport';
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-// import { UsersService } from '../users/users.service';
+import { Injectable } from '@nestjs/common';
+import { UserService } from '@/modules/user/user.service';
 
 @Injectable()
 export class BasicStrategy extends PassportStrategy(Strategy, 'basic') {
-  constructor(/* private readonly userService: UsersService */) {
+  constructor(private readonly userService: UserService) {
     super({ passReqToCallback: true });
   }
 
-  public validate = async (req, username: string, password: string): Promise<boolean> => {
-    // const user = await this.userService.validateUser({ email: username.toLowerCase(), password });
-    // if (!user) throw new BadRequestException('Invalid Credentials');
-
-    // delete user.user.password;
-    // return user;
-    return true
+  public validate = async (_req, email: string, password: string) => {
+    return this.userService.validateUser({ email, password });
   };
 }

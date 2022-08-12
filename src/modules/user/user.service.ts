@@ -1,11 +1,11 @@
-import { generateHash } from '@/common/crypto';
+import { compareHash, generateHash } from '@/common/crypto';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schema/user.schema';
 
@@ -35,11 +35,25 @@ export class UserService {
   }
 
   async findAll() {
-    return this.userModel.find();
+    return this.userModel.find().select('-password');
+  }
+
+  async validateUser(payload: { email: string; password: string }) {
+    const user = await this.userModel.findOne({
+      email: payload.email,
+      'audit.isDeleted': false,
+    });
+
+    if (!user) throw new BadRequestException('Invalid Credentials');
+    if (!(await compareHash(payload.password, user.password)))
+      throw new BadRequestException('Invalid Credentials');
+
+    return user;
   }
 
   async findOne(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id).select('-password');
     if (!user) throw new NotFoundException('User Not Found.');
+    return user;
   }
 }

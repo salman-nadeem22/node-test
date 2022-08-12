@@ -16,7 +16,7 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
-    return this.sendToken({_id:user._id});
+    return this.sendToken({ _id: user._id });
   }
 
   login(payload: { user: any }) {
@@ -29,8 +29,8 @@ export class AuthService {
     return { state: 'LOGIN', access: accessToken };
   }
 
-  IsAccessVerified(payload) {
-    return true;
+  IsAccessVerified(id: string) {
+    return this.userService.findOne(id);
   }
 
   accessToken(payload: { _id: string }) {

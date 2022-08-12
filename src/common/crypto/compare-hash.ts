@@ -1,5 +1,5 @@
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
-async function matchPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, this.password);
+export async function compareHash(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
 }
