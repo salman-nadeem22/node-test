@@ -9,6 +9,8 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Movie, MovieDocument } from './schema/movie.schema';
 import { Comment, CommentDocument } from './schema/comment.schema';
+import { IMovie } from './types/movie.interface';
+import { IComment } from './types/comment.interface';
 
 @Injectable()
 export class MovieService {
@@ -31,11 +33,33 @@ export class MovieService {
   }
 
   async findAll() {
-    return this.movieModel.find({ 'audit.isDeleted': false });
+    return (
+      await this.movieModel.aggregate([
+        {
+          $lookup: {
+            from: 'comments',
+            let: { id: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ['$movie', '$$id'] }],
+                  },
+                },
+              },
+            ],
+            as: 'comments',
+          },
+        },
+      ])
+    ).map((movie: IMovie) => ({
+      ...movie,
+      comments: this.transformComments(movie.comments),
+    }));
   }
 
   async findOne(slug: string) {
-    const movie = await this.movieModel.aggregate([
+    const [movie] = await this.movieModel.aggregate([
       {
         $match: { slug, 'audit.isDeleted': false },
       },
@@ -57,6 +81,7 @@ export class MovieService {
       },
     ]);
     if (!movie) throw new NotFoundException('Movie Not Found.');
+    movie.comments = this.transformComments(movie['comments']);
     return movie;
   }
 
@@ -65,5 +90,19 @@ export class MovieService {
     const comment = new this.commentModel({ ...payload, name: user.username });
     await comment.save();
     return comment;
+  }
+
+  private transformComments(comments: IComment[]) {
+    const transformedComments = {};
+    comments.forEach((comment) => {
+      if (transformedComments[comment.parent]) {
+        if (!transformedComments[comment.parent]?.children) {
+          transformedComments[comment.parent].children = [comment];
+        } else transformedComments[comment.parent].children.push(comment);
+        return;
+      }
+      transformedComments[comment._id] = comment;
+    });
+    return Object.values(transformedComments);
   }
 }
