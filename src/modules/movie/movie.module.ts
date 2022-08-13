@@ -3,6 +3,7 @@ import { MovieService } from './movie.service';
 import { MovieController } from './movie.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Movie, MovieSchema } from './schema/movie.schema';
+import { Comment, CommentSchema } from './schema/comment.schema';
 
 @Module({
   imports: [
@@ -10,6 +11,10 @@ import { Movie, MovieSchema } from './schema/movie.schema';
       {
         name: Movie.name,
         schema: MovieSchema,
+      },
+      {
+        name: Comment.name,
+        schema: CommentSchema,
       },
     ]),
   ],
