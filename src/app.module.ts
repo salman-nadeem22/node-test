@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ValidationPipe } from '@/common/pipes/validation.pipe';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UnprocessableEntityExceptionFilter } from './common/exception-filters';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { MovieModule } from './modules/movie/movie.module';
+import { TransformInterceptor } from '@/common/interceptor';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MovieModule } from './modules/movie/movie.module';
     }),
   ],
   providers: [
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
     { provide: APP_PIPE, useClass: ValidationPipe },
     { provide: APP_FILTER, useClass: UnprocessableEntityExceptionFilter },
   ],

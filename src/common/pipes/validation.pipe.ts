@@ -24,7 +24,7 @@ export class ValidationPipe implements PipeTransform<any> {
     const errors = {};
 
     validationErrors.forEach((error) => {
-      if (!error.children || !error.children.length) errors[error.property] = { constraints: error.constraints };
+      if (!error.children || !error.children.length) errors[error.property] = { errors: Object.values(error.constraints) };
       else errors[error.property] = this.formatErrors(error.children);
     });
 
