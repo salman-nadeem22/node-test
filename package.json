@@ -20,6 +20,9 @@
     "seeder": "npx ts-node db/seeder/index.ts",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
+  "engines": {
+    "node": "16"
+  },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.2.0",
