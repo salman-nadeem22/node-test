@@ -21,7 +21,7 @@ export class MovieService {
 
   // ? Movies Related
   async create(createMovieDto: CreateMovieDto) {
-    const movieNameExists = await this.movieModel.exists({
+    const movieNameExists = await this.movieModel.findOne({
       name: createMovieDto.name,
     });
     if (movieNameExists)
@@ -61,7 +61,7 @@ export class MovieService {
   async findOne(slug: string) {
     const [movie] = await this.movieModel.aggregate([
       {
-        $match: { slug, 'audit.isDeleted': false },
+        $match: { slug },
       },
       {
         $lookup: {
