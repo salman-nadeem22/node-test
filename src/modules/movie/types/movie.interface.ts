@@ -1,7 +1,7 @@
 import { IAudit } from '@/common/types';
 import { IComment } from './comment.interface';
 
-export interface IMovie extends IAudit {
+export interface IMovie {
   name: string;
   slug: string;
   description: string;
@@ -10,6 +10,7 @@ export interface IMovie extends IAudit {
   photo: string;
   releaseDate: Date;
   rating: number;
-  comments?: IComment[]
+  comments?: IComment[];
   price: number;
+  audit: IAudit;
 }
